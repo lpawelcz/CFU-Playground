@@ -54,11 +54,11 @@ export PLATFORM   ?= arty
 RUN_MENU_ITEMS    ?=1 1 1
 TEST_MENU_ITEMS   ?=5
 
-ifneq '' '$(fiter-out arty,sim,$(PLATFORM))'
-	$(error PLATFORM must be 'arty' or 'sim')
+ifneq '' '$(fiter-out arty,sim,gem,$(PLATFORM))'
+	$(error PLATFORM must be 'arty', 'gem' or 'sim')
 endif
 
-SOC_DIR          := $(CFU_ROOT)/soc
+SOC_DIR          := $(CFU_ROOT)/soc_$(PLATFORM)
 SOC_BUILD_NAME   := $(PLATFORM).$(PROJ)
 SOC_BUILD_DIR    := $(SOC_DIR)/build/$(SOC_BUILD_NAME)
 SOC_SOFTWARE_DIR := $(SOC_BUILD_DIR)/software
@@ -106,11 +106,14 @@ SOFTWARE_LOG     := $(BUILD_DIR)/software.log
 UNITTEST_LOG     := $(BUILD_DIR)/unittest.log
 
 # Directory where we build the project-specific gateware
-SOC_DIR      := $(CFU_ROOT)/soc
+SOC_DIR      := $(CFU_ROOT)/soc_$(PLATFORM)
 ARTY_MK      := $(MAKE) -C $(SOC_DIR) -f $(SOC_DIR)/arty.mk
+GEM_MK       := $(MAKE) -C $(SOC_DIR) -f $(SOC_DIR)/gem.mk
 SIM_MK       := $(MAKE) -C $(SOC_DIR) -f $(SOC_DIR)/sim.mk SOFTWARE_BIN=$(SOFTWARE_BIN)
 ifeq '$(PLATFORM)' 'arty'
 	SOC_MK   := $(ARTY_MK)
+else ifeq '$(PLATFORM)' 'gem'
+	SOC_MK   := $(GEM_MK)
 else
 	SOC_MK   := $(SIM_MK)
 endif
@@ -123,7 +126,7 @@ renode: $(SOFTWARE_ELF)
 
 .PHONY: clean
 clean:
-	$(ARTY_MK) clean
+	$(SOC_MK) clean
 	$(SIM_MK) clean
 	@echo Removing $(BUILD_DIR)
 	$(RM) $(BUILD_DIR)
@@ -184,6 +187,32 @@ unit: $(SOFTWARE_BIN)
 
 load: $(SOFTWARE_BIN)
 	@echo Running interactively on Arty Board
+	$(LXTERM) --speed $(UART_SPEED) $(CRC) --kernel $(SOFTWARE_BIN) $(TTY)
+
+else
+$(RUN_TARGETS):
+	@echo Error: could not determine unique TTY
+	@echo TTY possibilities: $(TTY)
+endif
+else ifeq 'gem' '$(PLATFORM)'
+# $(PLATFORM) == 'gem'
+prog: $(CFU_VERILOG)
+	$(GEM_MK) prog
+
+bitstream: $(CFU_VERILOG)
+	$(GEM_MK) bitstream
+
+ifeq '1' '$(words $(TTY))'
+run: $(SOFTWARE_BIN)
+	@echo Running automated pdti8 test on GEM Board
+	$(BUILD_DIR)/interact.expect $(SOFTWARE_BIN) $(TTY) $(UART_SPEED) $(RUN_MENU_ITEMS) |& tee $(SOFTWARE_LOG)
+
+unit: $(SOFTWARE_BIN)
+	@echo Running unit test on GEM Board
+	$(BUILD_DIR)/interact.expect $(SOFTWARE_BIN) $(TTY) $(UART_SPEED) $(TEST_MENU_ITEMS) |& tee $(UNITTEST_LOG)
+
+load: $(SOFTWARE_BIN)
+	@echo Running interactively on GEM Board
 	$(LXTERM) --speed $(UART_SPEED) $(CRC) --kernel $(SOFTWARE_BIN) $(TTY)
 
 else
