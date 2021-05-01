@@ -54,8 +54,8 @@ export PLATFORM   ?= arty
 RUN_MENU_ITEMS    ?=1 1 1
 TEST_MENU_ITEMS   ?=5
 
-ifneq '' '$(fiter-out nexys_video,arty,sim,$(PLATFORM))'
-	$(error PLATFORM must be 'arty' or 'nexys_video' or 'sim')
+ifneq '' '$(fiter-out nexys_video,arty,gem,sim,$(PLATFORM))'
+	$(error PLATFORM must be 'arty' or 'nexys_video' or 'gem' or 'sim')
 endif
 
 SOC_DIR          := $(CFU_ROOT)/soc
@@ -111,6 +111,7 @@ ARTY_MK      := $(MAKE) -C $(SOC_DIR) -f $(SOC_DIR)/arty.mk
 HPS_MK       := $(MAKE) -C $(SOC_DIR) -f $(SOC_DIR)/hps.mk
 SIM_MK       := $(MAKE) -C $(SOC_DIR) -f $(SOC_DIR)/sim.mk SOFTWARE_BIN=$(SOFTWARE_BIN)
 NEXYS_VIDEO_MK := $(MAKE) -C $(SOC_DIR) -f $(SOC_DIR)/nexys_video.mk
+GEM_MK := $(MAKE) -C $(SOC_DIR) -f $(SOC_DIR)/gem.mk
 ifeq '$(PLATFORM)' 'arty'
 	SOC_MK   := $(ARTY_MK)
 else ifeq '$(PLATFORM)' 'nexys_video'
@@ -119,8 +120,10 @@ else ifeq '$(PLATFORM)' 'hps'
 	SOC_MK   := $(HPS_MK)
 else ifeq '$(PLATFORM)' 'sim'
 	SOC_MK   := $(SIM_MK)
+else ifeq '$(PLATFORM)' 'gem'
+	SOC_MK   := $(GEM_MK)
 else
-	$(error PLATFORM must be 'arty' or 'nexys_video' or 'sim')
+	$(error PLATFORM must be 'arty' or 'nexys_video' or 'gem' or 'sim')
 endif
 
 .PHONY:	renode 
