@@ -23,8 +23,8 @@ echo Using FTDI device $FID
 sfabric set ftdevid $FID
 sfabric init
 
-sfabric reg program Digital_Programming_Flash.csv
-sfabric reg compare Digital_Programming_Flash.csv -
+sfabric reg program $GEM_FLASH_MAP
+sfabric reg compare $GEM_FLASH_MAP -
 
 #verify flash ID
 sudo iceprog -I B -d i:0x0403:0x6011 -t
@@ -34,9 +34,9 @@ sudo iceprog -I B -d i:0x0403:0x6011 -b
 sudo iceprog -I B -d i:0x0403:0x6011 -t
 sleep 1
 #upload
-sudo iceprog -I B -d i:0x0403:0x6011 ../../build/gem.proj_template/gateware/gem.bin
+sudo iceprog -I B -d i:0x0403:0x6011 $CFU_GATEWARE
 #upload bios
-sudo iceprog -I B -d i:0x0403:0x6011 -o 0x020000 ../../build/gem.proj_template/software/bios/bios.bin
+sudo iceprog -I B -d i:0x0403:0x6011 -o 0x020000 $CFU_BIOS
 #sudo iceprog -I B -d i:0x0403:0x6011 combined_image.bin
 
 sudo modprobe usbserial 

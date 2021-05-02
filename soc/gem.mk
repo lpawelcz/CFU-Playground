@@ -51,6 +51,14 @@ GEM_RUN:=  MAKEFLAGS=-j8 $(PYRUN) ./gem.py $(LITEX_ARGS)
 
 BIOS_BIN := $(OUT_DIR)/software/bios/bios.bin
 BITSTREAM:= $(OUT_DIR)/gateware/gem.bit
+GATEWARE := $(OUT_DIR)/gateware/gem.bin
+
+GEM_SCRIPTS=soc_gem/scripts
+GEM_FLASH_MAP=${GEM_SCRIPTS}/Digital_Programming_Flash.csv
+GEM_SCRIPT_A=${GEM_SCRIPTS}/A_sfabric.sh
+GEM_SCRIPT_B=${GEM_SCRIPTS}/B_flash.sh
+GEM_SCRIPT_C=${GEM_SCRIPTS}/C_camera_test.sh
+GEM_SCRIPT_D=${GEM_SCRIPTS}/D_zephyr_boot.sh
 
 .PHONY: bitstream litex-software prog clean check-timing
 
@@ -75,7 +83,11 @@ endif
 
 prog: $(BITSTREAM) check-timing
 	@echo Loading bitstream onto Gem
-	$(GEM_RUN) --no-compile-software --load
+	./$(GEM_SCRIPT_A) && \
+	export GEM_FLASH_MAP=${GEM_FLASH_MAP} && \
+	export CFU_GATEWARE=${GATEWARE} && \
+	export CFU_BIOS=${BIOS_BIN} && \
+	./$(GEM_SCRIPT_B)
 
 clean:
 	@echo Removing $(OUT_DIR)
