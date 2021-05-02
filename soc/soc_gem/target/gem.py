@@ -118,24 +118,3 @@ class BaseSoC(SoCCore):
         # onto softcore's address bus.
         platform.toolchain.build_template[2] = "icepack -s {build_name}.txt {build_name}.bin"
 
-# Build --------------------------------------------------------------------------------------------
-
-def main():
-    parser = argparse.ArgumentParser(description="LiteX SoC on Fomu")
-    parser.add_argument("--build",             action="store_true", help="Build bitstream")
-    parser.add_argument("--sys-clk-freq",      default=12e6,        help="System clock frequency (default: 12MHz)")
-    parser.add_argument("--bios-flash-offset", default=0x60000,     help="BIOS offset in SPI Flash (default: 0x60000)")
-    parser.add_argument("--flash",             action="store_true", help="Flash Bitstream")
-    builder_args(parser)
-    soc_core_args(parser)
-    args = parser.parse_args()
-
-    soc = BaseSoC()
-    builder = Builder(soc, **builder_argdict(args))
-    builder.build(run=args.build)
-
-    if args.flash:
-        flash(args.bios_flash_offset)
-
-if __name__ == "__main__":
-    main()
