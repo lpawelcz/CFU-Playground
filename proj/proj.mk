@@ -202,7 +202,6 @@ load: $(SOFTWARE_BIN)
 	@echo Running interactively on HPS Board
 	$(CFU_ROOT)/scripts/hps_prog $(SOFTWARE_BIN) program
 	$(LXTERM) --speed 115200 $(TTY)
-
 connect:
 	@echo Connecting to HPS Board
 	$(LXTERM) --speed 115200 $(TTY)
@@ -212,6 +211,10 @@ load: $(SOFTWARE_BIN)
 	$(LXTERM) --speed $(UART_SPEED) $(CRC) --kernel $(SOFTWARE_BIN) $(TTY)
 endif
 
+else ifeq 'gem' '$(PLATFORM)'
+load: $(SOFTWARE_BIN)
+	@echo Running interactively on GEM1
+	$(SOC_MK) load
 else
 $(RUN_TARGETS):
 	@echo Error: could not determine unique TTY

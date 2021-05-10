@@ -54,7 +54,8 @@ class BaseSoC(SoCCore):
             kwargs['integrated_rom_size']=0
         if 'integrated_sram_size' not in kwargs:
             kwargs['integrated_sram_size']=0
-        kwargs["cpu_variant"] = "minimal"
+        kwargs["cpu_variant"] = "full"
+        # kwargs["cpu_variant"] = "minimal"
 
         # FIXME: Force either lite or minimal variants of CPUs; full is too big.
         platform.add_extension(gem.serial)
