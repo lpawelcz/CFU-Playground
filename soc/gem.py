@@ -43,8 +43,7 @@ def main():
     if args.cfu:
         assert 'full' in soc.cpu.variant
         if args.slim_cpu:
-            var = "MinCfuDebug" if args.debug else "MinCfu"
-            # var = "LiteCfuDebug" if args.debug else "LiteCfu"
+            var = "LiteCfuDebug" if args.debug else "LiteCfu"
         else:
             var = "FullCfuDebug" if args.debug else "FullCfu"
         vexriscv = "../third_party/python/pythondata_cpu_vexriscv/pythondata_cpu_vexriscv"
