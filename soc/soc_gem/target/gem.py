@@ -101,11 +101,9 @@ class BaseSoC(SoCCore):
         self.add_csr("fpga_gpio")
         # SPRAM- UP5K has single port RAM, might as well use it as SRAM to
         # free up scarce block RAM.
-        self.submodules.spram = ice40.SPRAM(size=64*1024)
+        self.submodules.spram = ice40.SPRAM(size=128*1024)
         self.register_mem("sram", self.mem_map["sram"], self.spram.bus, 0x10000)
 
-        self.submodules.mainram = ice40.SPRAM(size=64*1024)
-        self.register_mem("main_ram", self.mem_map["main_ram"], self.mainram.bus, 0x10000)
         # We don't have a DRAM, so use the remaining SPI flash for user
         # program.
         self.add_memory_region("user_flash",
