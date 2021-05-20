@@ -51,6 +51,7 @@ PYRUN:=     $(CFU_ROOT)/scripts/pyrun
 GEM_RUN:=  MAKEFLAGS=-j8 $(PYRUN) ./gem.py $(LITEX_ARGS)
 
 SOFTWARE_BIN := $(PROJ_DIR)/build/software.bin
+CRC_SOFTWARE_BIN := $(PROJ_DIR)/build/crc_software.bin
 BIOS_BIN := $(OUT_DIR)/software/bios/bios.bin
 BITSTREAM:= $(OUT_DIR)/gateware/gem.bit
 GATEWARE := $(OUT_DIR)/gateware/gem.bin
@@ -62,6 +63,8 @@ GEM_SCRIPT_B=${GEM_SCRIPTS}/B_flash.sh
 GEM_SCRIPT_B_ALL=${GEM_SCRIPTS}/B_flash_all.sh
 GEM_SCRIPT_C=${GEM_SCRIPTS}/C_camera_test.sh
 GEM_SCRIPT_D=${GEM_SCRIPTS}/D_zephyr_boot.sh
+
+MKMSCIMG=${CFU_ROOT}/third_party/python/litex/litex/soc/software/mkmscimg.py
 
 .PHONY: bitstream litex-software prog clean check-timing
 
@@ -85,12 +88,14 @@ check-timing:
 endif
 
 load: $(BITSTREAM) check-timing
-	@echo Loading bitstream onto Gem && \
+	@echo Modifying software binary && \
+	echo "${MKMSCIMG} ${SOFTWARE_BIN} -o ${CRC_SOFTWARE_BIN} -f -l" && \
+	python ${MKMSCIMG} ${SOFTWARE_BIN} -o ${CRC_SOFTWARE_BIN} -f -l && \
 	./$(GEM_SCRIPT_A) && \
 	export GEM_FLASH_MAP=${GEM_FLASH_MAP} && \
 	export CFU_GATEWARE=${GATEWARE} && \
 	export CFU_BIOS=${BIOS_BIN} && \
-	export CFU_SOFTWARE=${SOFTWARE_BIN} && \
+	export CFU_SOFTWARE=${CRC_SOFTWARE_BIN} && \
 	echo LOADING GEM && \
 	./$(GEM_SCRIPT_B_ALL)
 
