@@ -38,7 +38,7 @@ sudo iceprog -I B -d i:0x0403:0x6011 $CFU_GATEWARE
 #upload bios
 sudo iceprog -I B -d i:0x0403:0x6011 -o 0x020000 $CFU_BIOS
 #upload program
-sudo iceprog -I B -d i:0x0403:0x6011 -o 0x028000 $CFU_SOFTWARE -n -X
+sudo iceprog -I B -d i:0x0403:0x6011 -o 0x028000 $CFU_SOFTWARE -n
 #sudo iceprog -I B -d i:0x0403:0x6011 -o 0x030000 $CFU_SOFTWARE -n -X
 #sudo iceprog -I B -d i:0x0403:0x6011 combined_image.bin
 
