@@ -14,7 +14,7 @@ SECTIONS
 		*(.text.start)
 		*(.text .stub .text.* .gnu.linkonce.t.*)
 		_etext = .;
-	} > spiflash
+	} > user_flash
 	/*} > rom */
 
 	.rodata :
@@ -26,7 +26,7 @@ SECTIONS
 		*(.srodata .srodata.*)
 		. = ALIGN(8);
 		_erodata = .;
-	} > spiflash
+	} > user_flash
 	/*} > rom */
 
 	.data : AT (ADDR(.rodata) + SIZEOF (.rodata))
@@ -39,7 +39,7 @@ SECTIONS
 		_gp = ALIGN(16);
 		*(.sdata .sdata.* .gnu.linkonce.s.* .sdata2 .sdata2.*)
 		_edata = ALIGN(16); /* Make sure _edata is >= _gp. */
-	} > spiflash
+	} > user_flash
 	/*} > sram */
 
 	.bss : AT (ADDR(.data) + SIZEOF (.data))
@@ -55,9 +55,9 @@ SECTIONS
 		. = ALIGN(8);
 		_ebss = .;
 		_end = .;
-	} > spiflash
+	} > user_flash
 	/*} > sram */
 }
 
-PROVIDE(_fstack = ORIGIN(spiflash) + LENGTH(spiflash) - 4);
+PROVIDE(_fstack = ORIGIN(user_flash) + LENGTH(user_flash) - 4);
 /* PROVIDE(_fstack = ORIGIN(sram) + LENGTH(sram) - 4); */
